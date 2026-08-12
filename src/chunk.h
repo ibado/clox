@@ -12,14 +12,14 @@ typedef enum {
 typedef struct {
   int count;
   int capacity;
-  u8* code;
-  int* lines;
+  u8 *code;
+  int *lines;
   ValueArray constants;
 } Chunk;
 
-void chunk_init(Chunk* chunk);
-void chunk_write(Chunk* chunk, u8 byte, int line);
-void chunk_free(Chunk* chunk);
-int chunk_add_const(Chunk* chunk, Value value);
+void chunk_init(Chunk *chunk);
+void chunk_write(Chunk *chunk, u8 byte, int line);
+void chunk_free(Chunk *chunk);
+int chunk_add_const(Chunk *chunk, Value value);
 
 #endif
