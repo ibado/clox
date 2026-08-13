@@ -26,10 +26,11 @@ static int const_instruction(const char *name, Chunk *chunk, int offset) {
 int disassemble_instruction(Chunk *chunk, int offset) {
   printf("%04d ", offset);
 
-  if (offset > 0 && chunk->lines[offset] == chunk->lines[offset - 1]) {
+  int lineCurrent = chunk_get_line(chunk, offset);
+  if (offset > 0 && lineCurrent == chunk_get_line(chunk, offset - 1)) {
     printf("   | ");
   } else {
-    printf("%4d ", chunk->lines[offset]);
+    printf("%4d ", lineCurrent);
   }
 
   u8 instruction = chunk->code[offset];

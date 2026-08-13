@@ -11,6 +11,13 @@ int main() {
   chunk_write(&chunk, constant, 123);
 
   chunk_write(&chunk, OP_RETURN, 123);
+  chunk_write(&chunk, OP_RETURN, 124);
+  chunk_write(&chunk, OP_RETURN, 124);
+  chunk_write(&chunk, OP_RETURN, 125);
+  chunk_write(&chunk, OP_RETURN, 125);
+  chunk_write(&chunk, OP_RETURN, 125);
+  chunk_write(&chunk, OP_RETURN, 127);
+  chunk_write(&chunk, OP_RETURN, 128);
 
   disassemble_chunk(&chunk, "test chunk");
   chunk_free(&chunk);
