@@ -2,3 +2,4 @@
 #include "memory.c"
 #include "debug.c"
 #include "value.c"
+#include "vm.c"

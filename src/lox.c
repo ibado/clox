@@ -1,8 +1,11 @@
 #include "chunk.h"
 #include "debug.h"
 #include "unity.h"
+#include "vm.h"
 
 int main() {
+  vm_init();
+
   Chunk chunk;
   chunk_init(&chunk);
 
@@ -20,6 +23,8 @@ int main() {
   chunk_write(&chunk, OP_RETURN, 128);
 
   disassemble_chunk(&chunk, "test chunk");
+  vm_exec(&chunk);
+  vm_free();
   chunk_free(&chunk);
   return 0;
 }
