@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#define DEBUG_TRANCE_EXECUTION
+
 typedef uint8_t u8;
 
 #endif
