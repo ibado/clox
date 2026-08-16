@@ -4,18 +4,26 @@
 #include "value.h"
 #include <stdio.h>
 
+#define BINARY_OP(op)                                                          \
+  do {                                                                         \
+    Value b = pop_value();                                                     \
+    Value a = pop_value();                                                     \
+    push_value(a op b);                                                        \
+  } while (false)
+
 VM vm;
 
 static void reset_stack() { vm.stack_top = vm.stack; }
 
-void vm_init() { reset_stack(); }
-
-void vm_free() {}
-
 static inline u8 read_byte() { return *vm.ip++; }
+
 static inline Value read_constant() {
   return vm.chunk->constants.values[read_byte()];
 }
+
+void vm_init() { reset_stack(); }
+
+void vm_free() {}
 
 static VmResult run() {
   for (;;) {
@@ -29,13 +37,28 @@ static VmResult run() {
     printf("\n");
     disassemble_instruction(vm.chunk, (int)(vm.ip - vm.chunk->code));
 #endif
-    u8 instruction;
+    OpCode instruction;
     switch (instruction = read_byte()) {
     case OP_CONSTANT: {
       Value value = read_constant();
       push_value(value);
       break;
     }
+    case OP_ADD:
+      BINARY_OP(+);
+      break;
+    case OP_SUBTRACT:
+      BINARY_OP(-);
+      break;
+    case OP_MULTIPLY:
+      BINARY_OP(*);
+      break;
+    case OP_DIVIDE:
+      BINARY_OP(/);
+      break;
+    case OP_NEGATE:
+      push_value(-pop_value());
+      break;
     case OP_RETURN: {
       value_print(pop_value());
       printf("\n");
