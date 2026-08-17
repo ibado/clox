@@ -26,6 +26,7 @@ void vm_init() { reset_stack(); }
 void vm_free() {}
 
 static VmResult run() {
+  int ins_idx = 0;
   for (;;) {
 #ifdef DEBUG_TRANCE_EXECUTION
     printf("          ");
@@ -35,12 +36,16 @@ static VmResult run() {
       printf("]");
     }
     printf("\n");
-    disassemble_instruction(vm.chunk, (int)(vm.ip - vm.chunk->code));
+    if (ins_idx < vm.chunk->count)
+      disassemble_instruction(vm.chunk, (int)(vm.ip - vm.chunk->code));
 #endif
+    if (ins_idx >= vm.chunk->count)
+      return VM_OK;
     OpCode instruction;
     switch (instruction = read_byte()) {
     case OP_CONSTANT: {
       Value value = read_constant();
+      ins_idx++;
       push_value(value);
       break;
     }
@@ -65,6 +70,7 @@ static VmResult run() {
       return VM_OK;
     }
     }
+    ins_idx++;
   }
 }
 

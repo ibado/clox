@@ -8,24 +8,19 @@ int main() {
   Chunk chunk;
   chunk_init(&chunk);
 
-  chunk_write(&chunk, OP_CONSTANT, 123);
-  int constant = chunk_add_const(&chunk, 1.2);
-  chunk_write(&chunk, constant, 123);
+#define ADD_CONST(chunk, val, line)                                            \
+  do {                                                                         \
+    chunk_write((chunk), OP_CONSTANT, (line));                                 \
+    int constant = chunk_add_const((chunk), (val));                            \
+    chunk_write((chunk), constant, (line));                                    \
+  } while (false)
 
-  chunk_write(&chunk, OP_CONSTANT, 123);
-  constant = chunk_add_const(&chunk, 3.4);
-  chunk_write(&chunk, constant, 123);
-
-  chunk_write(&chunk, OP_ADD, 123);
-
-  chunk_write(&chunk, OP_CONSTANT, 123);
-  constant = chunk_add_const(&chunk, 5.6);
-  chunk_write(&chunk, constant, 123);
-
-  chunk_write(&chunk, OP_DIVIDE, 123);
-
-  chunk_write(&chunk, OP_NEGATE, 123);
-  chunk_write(&chunk, OP_RETURN, 124);
+  ADD_CONST(&chunk, 3, 1);
+  ADD_CONST(&chunk, 2, 1);
+  ADD_CONST(&chunk, 1, 1);
+  chunk_write(&chunk, OP_MULTIPLY, 1);
+  chunk_write(&chunk, OP_ADD, 1);
+  chunk_write(&chunk, OP_RETURN, 1);
 
   vm_exec(&chunk);
   vm_free();
