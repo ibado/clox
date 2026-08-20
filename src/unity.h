@@ -3,3 +3,5 @@
 #include "debug.c"
 #include "value.c"
 #include "vm.c"
+#include "lexer.c"
+#include "compiler.c"

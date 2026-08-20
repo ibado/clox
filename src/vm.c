@@ -1,5 +1,6 @@
 #include "vm.h"
 #include "chunk.h"
+#include "compiler.h"
 #include "debug.h"
 #include "value.h"
 #include <stdio.h>
@@ -25,7 +26,7 @@ void vm_init() { reset_stack(); }
 
 void vm_free() {}
 
-static VmResult run() {
+/*static VmResult run() {
   int ins_idx = 0;
   for (;;) {
 #ifdef DEBUG_TRANCE_EXECUTION
@@ -72,12 +73,11 @@ static VmResult run() {
     }
     ins_idx++;
   }
-}
+}*/
 
-VmResult vm_exec(Chunk *chunk) {
-  vm.chunk = chunk;
-  vm.ip = vm.chunk->code;
-  return run();
+VmResult vm_exec(const char *source) {
+  compile(source);
+  return VM_OK;
 }
 
 void push_value(Value value) {
