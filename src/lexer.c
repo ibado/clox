@@ -1,4 +1,5 @@
 #include "lexer.h"
+#include <ctype.h>
 #include <string.h>
 
 typedef struct {
@@ -15,7 +16,9 @@ void lexer_init(const char *source) {
   lexer.line = 1;
 }
 
-static bool is_at_end() { return *lexer.current == '\0'; }
+static char peek() { return *lexer.current; }
+
+static bool is_at_end() { return peek() == '\0'; }
 
 static Token make_token(TokenType type) {
   return (Token){
@@ -42,7 +45,7 @@ static char advance() {
 
 static bool match(char c) {
   if (is_at_end()) return false;
-  if (*lexer.current != c) return false;
+  if (peek() != c) return false;
   lexer.current++;
   return true;
 }
@@ -53,7 +56,34 @@ static char peek_next() {
 }
 
 static void advance_until(char c) {
-  while (*lexer.current != c && !is_at_end()) advance();
+  while (peek() != c && !is_at_end()) {
+    if (peek() == '\n') lexer.line++;
+    advance();
+  }
+}
+
+static Token string() {
+  advance_until('"');
+  if (is_at_end()) return error_token("Unterminated string");
+  advance(); // consume closing quote
+  return make_token(TOKEN_STRING);
+}
+
+static Token number() {
+  while (isdigit(peek())) advance();
+  if (peek() == '.' && isdigit(peek_next())) {
+    advance(); // consume the dot
+    while (isdigit(peek())) advance();
+  }
+
+  return make_token(TOKEN_NUMBER);
+}
+
+static TokenType identifier_type() { return TOKEN_IDENTIFIER; }
+
+static Token identifier() {
+  while (isalpha(peek()) || isdigit(peek() || peek() == '_')) advance();
+  return make_token(identifier_type());
 }
 
 Token lexer_scan() {
@@ -71,13 +101,14 @@ Token lexer_scan() {
   case '-': return make_token(TOKEN_MINUS);
   case '+': return make_token(TOKEN_PLUS);
   case '*': return make_token(TOKEN_STAR);
-  case '/':
-    return match('/') ? (advance_until('\n'), lexer_scan())
-                      : make_token(TOKEN_SLASH);
   case '!': return make_token(match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
   case '=': return make_token(match('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
   case '<': return make_token(match('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
   case '>': return make_token(match('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
+  case '/':
+    return match('/') ? (advance_until('\n'), lexer_scan())
+                      : make_token(TOKEN_SLASH);
+  case '"': return string();
   case ' ':
   case '\r':
   case '\t': return lexer_scan(); // ignore whitespace
@@ -85,6 +116,9 @@ Token lexer_scan() {
     lexer.line++;
     return lexer_scan();
   }
-  default: return error_token("Unexpected character");
+  default:
+    return isdigit(c)   ? number()
+           : isalpha(c) ? identifier()
+                        : error_token("Unexpected character");
   }
 }
