@@ -79,7 +79,42 @@ static Token number() {
   return make_token(TOKEN_NUMBER);
 }
 
-static TokenType identifier_type() { return TOKEN_IDENTIFIER; }
+static TokenType identifier_type() {
+  size_t size = lexer.current - lexer.start;
+  switch (size) {
+  case 2: {
+    if (memcmp("or", lexer.start, size) == 0) return TOKEN_OR;
+    if (memcmp("if", lexer.start, size) == 0) return TOKEN_IF;
+    break;
+  }
+  case 3: {
+    if (memcmp("and", lexer.start, size) == 0) return TOKEN_AND;
+    if (memcmp("fun", lexer.start, size) == 0) return TOKEN_FUN;
+    if (memcmp("for", lexer.start, size) == 0) return TOKEN_FOR;
+    if (memcmp("nil", lexer.start, size) == 0) return TOKEN_NIL;
+    if (memcmp("var", lexer.start, size) == 0) return TOKEN_VAR;
+    break;
+  }
+  case 4: {
+    if (memcmp("else", lexer.start, size) == 0) return TOKEN_ELSE;
+    if (memcmp("this", lexer.start, size) == 0) return TOKEN_THIS;
+    if (memcmp("true", lexer.start, size) == 0) return TOKEN_TRUE;
+    break;
+  }
+  case 5: {
+    if (memcmp("class", lexer.start, size) == 0) return TOKEN_CLASS;
+    if (memcmp("false", lexer.start, size) == 0) return TOKEN_FALSE;
+    if (memcmp("print", lexer.start, size) == 0) return TOKEN_PRINT;
+    if (memcmp("super", lexer.start, size) == 0) return TOKEN_SUPER;
+    if (memcmp("while", lexer.start, size) == 0) return TOKEN_WHILE;
+    break;
+  }
+  case 6:
+    if (memcmp("return", lexer.start, size) == 0) return TOKEN_RETURN;
+  }
+
+  return TOKEN_IDENTIFIER;
+}
 
 static Token identifier() {
   while (isalpha(peek()) || isdigit(peek() || peek() == '_')) advance();

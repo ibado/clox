@@ -8,7 +8,7 @@ void compile(const char *source) {
   for (;;) {
     Token token = lexer_scan();
     if (token.line != line) {
-      printf("%4d", token.line);
+      printf("%4d ", token.line);
       line = token.line;
     } else {
       printf("   | ");

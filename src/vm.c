@@ -1,9 +1,7 @@
 #include "vm.h"
 #include "chunk.h"
 #include "compiler.h"
-#include "debug.h"
 #include "value.h"
-#include <stdio.h>
 
 #define BINARY_OP(op)                                                          \
   do {                                                                         \
