@@ -1,7 +1,9 @@
 #include "vm.h"
 #include "chunk.h"
 #include "compiler.h"
+#include "debug.h"
 #include "value.h"
+#include <stdio.h>
 
 #define BINARY_OP(op)                                                          \
   do {                                                                         \
@@ -24,7 +26,7 @@ void vm_init() { reset_stack(); }
 
 void vm_free() {}
 
-/*static VmResult run() {
+static VmResult run() {
   int ins_idx = 0;
   for (;;) {
 #ifdef DEBUG_TRANCE_EXECUTION
@@ -38,8 +40,7 @@ void vm_free() {}
     if (ins_idx < vm.chunk->count)
       disassemble_instruction(vm.chunk, (int)(vm.ip - vm.chunk->code));
 #endif
-    if (ins_idx >= vm.chunk->count)
-      return VM_OK;
+    if (ins_idx >= vm.chunk->count) return VM_OK;
     OpCode instruction;
     switch (instruction = read_byte()) {
     case OP_CONSTANT: {
@@ -48,21 +49,11 @@ void vm_free() {}
       push_value(value);
       break;
     }
-    case OP_ADD:
-      BINARY_OP(+);
-      break;
-    case OP_SUBTRACT:
-      BINARY_OP(-);
-      break;
-    case OP_MULTIPLY:
-      BINARY_OP(*);
-      break;
-    case OP_DIVIDE:
-      BINARY_OP(/);
-      break;
-    case OP_NEGATE:
-      push_value(-pop_value());
-      break;
+    case OP_ADD: BINARY_OP(+); break;
+    case OP_SUBTRACT: BINARY_OP(-); break;
+    case OP_MULTIPLY: BINARY_OP(*); break;
+    case OP_DIVIDE: BINARY_OP(/); break;
+    case OP_NEGATE: push_value(-pop_value()); break;
     case OP_RETURN: {
       value_print(pop_value());
       printf("\n");
@@ -71,11 +62,24 @@ void vm_free() {}
     }
     ins_idx++;
   }
-}*/
+}
 
 VmResult vm_exec(const char *source) {
-  compile(source);
-  return VM_OK;
+  Chunk chunk;
+  chunk_init(&chunk);
+  if (!compile(source, &chunk)) {
+    chunk_free(&chunk);
+    return RUNTIME_ERROR;
+  }
+
+  vm.chunk = &chunk;
+  vm.ip = vm.chunk->code;
+
+  VmResult result = run();
+
+  chunk_free(&chunk);
+
+  return result;
 }
 
 void push_value(Value value) {
