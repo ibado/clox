@@ -1,5 +1,8 @@
 #include "compiler.h"
 #include "chunk.h"
+#ifdef DEBUG_PRINT_CODE
+#include "debug.h"
+#endif
 #include "lexer.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -111,7 +114,22 @@ static void emit_constant(double value) {
   emit_bytes(OP_CONSTANT, make_constant(value));
 }
 
-static void parse_precedence(Precedence precedence) {}
+static void parse_precedence(Precedence precedence) {
+  parser_advance();
+  ParseFn prefix_rule = get_rule(parser.previous.type)->prefix;
+  if (prefix_rule == NULL) {
+    error("Expect expression");
+    return;
+  }
+
+  prefix_rule();
+
+  while (precedence <= get_rule(parser.current.type)->precedence) {
+    parser_advance();
+    ParseFn infix_rule = get_rule(parser.previous.type)->infix;
+    infix_rule();
+  }
+}
 
 static void expression() { parse_precedence(PREC_ASSIGNMENT); }
 
@@ -202,5 +220,8 @@ bool compile(const char *source, Chunk *chunk) {
   expression();
   consume(TOKEN_EOF, "Expected end of expression");
   end_compiler();
+#ifdef DEBUG_PRINT_CODE
+  if (!parser.had_error) { disassemble_chunk(current_chunk(), "code"); }
+#endif
   return !parser.had_error;
 }
