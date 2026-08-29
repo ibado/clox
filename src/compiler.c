@@ -50,7 +50,7 @@ static void error_at(Token *token, const char *msg) {
   if (token->type == TOKEN_EOF) {
     fprintf(stderr, " at end");
   } else if (token->type != TOKEN_ERROR) {
-    fprintf(stderr, "at '%.*s'", token->length, token->start);
+    fprintf(stderr, " at '%.*s'", token->length, token->start);
   }
 
   fprintf(stderr, ": %s\n", msg);

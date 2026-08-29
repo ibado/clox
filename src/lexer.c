@@ -126,8 +126,8 @@ Token lexer_scan() {
   if (is_at_end()) return make_token(TOKEN_EOF);
   char c = advance();
   switch (c) {
-  case '(': return make_token(TOKEN_RIGHT_PAREN);
-  case ')': return make_token(TOKEN_LEFT_PAREN);
+  case '(': return make_token(TOKEN_LEFT_PAREN);
+  case ')': return make_token(TOKEN_RIGHT_PAREN);
   case '{': return make_token(TOKEN_LEFT_BRACE);
   case '}': return make_token(TOKEN_RIGHT_BRACE);
   case ';': return make_token(TOKEN_SEMICOLON);
