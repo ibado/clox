@@ -24,4 +24,4 @@ void value_array_free(ValueArray *array) {
   value_array_init(array);
 }
 
-void value_print(Value value) { printf("%g", value); }
+void value_print(Value value) { printf("%g", AS_NUMBER(value)); }

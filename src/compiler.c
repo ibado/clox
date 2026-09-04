@@ -1,5 +1,6 @@
 #include "compiler.h"
 #include "chunk.h"
+#include "value.h"
 #ifdef DEBUG_PRINT_CODE
 #include "debug.h"
 #endif
@@ -100,7 +101,7 @@ static void expression();
 static ParseRule *get_rule(TokenType type);
 static void parse_precedence(Precedence precedence);
 
-static u8 make_constant(double value) {
+static u8 make_constant(Value value) {
   int constidx = chunk_add_const(compiling_chunk, value);
   if (constidx >= 255) {
     error("");
@@ -110,7 +111,7 @@ static u8 make_constant(double value) {
   return (u8)constidx;
 }
 
-static void emit_constant(double value) {
+static void emit_constant(Value value) {
   emit_bytes(OP_CONSTANT, make_constant(value));
 }
 
@@ -135,7 +136,7 @@ static void expression() { parse_precedence(PREC_ASSIGNMENT); }
 
 static void parse_number() {
   double value = strtod(parser.previous.start, NULL);
-  emit_constant(value);
+  emit_constant(NUMBER_VAL(value));
 }
 
 static void parse_unary() {
