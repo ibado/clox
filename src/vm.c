@@ -46,6 +46,10 @@ static void runtime_error(const char *format, ...) {
 
 static Value stack_peek(int distance) { return vm.stack_top[-1 - distance]; }
 
+static bool is_falsey(Value value) {
+  return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
+}
+
 static VmResult run() {
   int ins_idx = 0;
   for (;;) {
@@ -69,10 +73,22 @@ static VmResult run() {
       push_value(value);
       break;
     }
+    case OP_NIL: push_value(NIL_VAL); break;
+    case OP_TRUE: push_value(BOOL_VAL(true)); break;
+    case OP_FALSE: push_value(BOOL_VAL(false)); break;
+    case OP_EQUAL: {
+      Value b = pop_value();
+      Value a = pop_value();
+      push_value(BOOL_VAL(value_equal(a, b)));
+      break;
+    }
+    case OP_GREATER: BINARY_OP(BOOL_VAL, >); break;
+    case OP_LESS: BINARY_OP(BOOL_VAL, <); break;
     case OP_ADD: BINARY_OP(NUMBER_VAL, +); break;
     case OP_SUBTRACT: BINARY_OP(NUMBER_VAL, -); break;
     case OP_MULTIPLY: BINARY_OP(NUMBER_VAL, *); break;
     case OP_DIVIDE: BINARY_OP(NUMBER_VAL, /); break;
+    case OP_NOT: push_value(BOOL_VAL(is_falsey(pop_value()))); break;
     case OP_NEGATE:
       if (!IS_NUMBER(stack_peek(0))) {
         runtime_error("Operand must be a number");
