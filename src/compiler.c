@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "object.h"
 
 typedef struct {
   Token previous;
@@ -139,6 +140,10 @@ static void parse_number() {
   emit_constant(NUMBER_VAL(value));
 }
 
+static void parse_string() {
+  emit_constant(OBJECT_VAL(copy_string(parser.previous.start + 1, parser.previous.length - 2)));
+}
+
 static void parse_unary() {
   TokenType operator_type = parser.previous.type;
 
@@ -203,7 +208,7 @@ ParseRule rules[] = {
     [TOKEN_LESS] = {NULL, parse_binary, PREC_COMPARISON},
     [TOKEN_LESS_EQUAL] = {NULL, parse_binary, PREC_COMPARISON},
     [TOKEN_IDENTIFIER] = {NULL, NULL, PREC_NONE},
-    [TOKEN_STRING] = {NULL, NULL, PREC_NONE},
+    [TOKEN_STRING] = {parse_string, NULL, PREC_NONE},
     [TOKEN_NUMBER] = {parse_number, NULL, PREC_NONE},
     [TOKEN_AND] = {NULL, NULL, PREC_NONE},
     [TOKEN_CLASS] = {NULL, NULL, PREC_NONE},

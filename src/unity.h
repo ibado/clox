@@ -5,3 +5,4 @@
 #include "vm.c"
 #include "lexer.c"
 #include "compiler.c"
+#include "object.c"
