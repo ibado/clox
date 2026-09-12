@@ -4,7 +4,6 @@
 #include "memory.h"
 #include "object.h"
 #include "value.h"
-#include "vm.h"
 
 #define ALLOCATE_OBJ(type, object_type)                                        \
   (type *)allocate_object(sizeof(type), object_type)
@@ -20,6 +19,10 @@ static ObjString *allocate_string(char *chars, int length) {
   string->length = length;
   string->chars = chars;
   return string;
+}
+
+ObjString *take_string(char *chars, int len) {
+  return allocate_string(chars, len);
 }
 
 ObjString *copy_string(const char *chars, int length) {

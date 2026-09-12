@@ -2,9 +2,12 @@
 #include "chunk.h"
 #include "compiler.h"
 #include "debug.h"
+#include "memory.h"
+#include "object.h"
 #include "value.h"
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 
 #define BINARY_OP(value_type, op)                                              \
   do {                                                                         \
@@ -50,6 +53,20 @@ static bool is_falsey(Value value) {
   return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
 }
 
+static void concatenate() {
+  ObjString *a = AS_STRING(pop_value());
+  ObjString *b = AS_STRING(pop_value());
+
+  int len = a->length + b->length;
+  char *chars = ALLOCATE(char, len + 1);
+  memcpy(chars, a->chars, a->length);
+  memcpy(chars + a->length, b->chars, b->length);
+  chars[len] = 0;
+
+  ObjString *result = take_string(chars, len);
+  push_value(OBJECT_VAL(result));
+}
+
 static VmResult run() {
   int ins_idx = 0;
   for (;;) {
@@ -84,7 +101,19 @@ static VmResult run() {
     }
     case OP_GREATER: BINARY_OP(BOOL_VAL, >); break;
     case OP_LESS: BINARY_OP(BOOL_VAL, <); break;
-    case OP_ADD: BINARY_OP(NUMBER_VAL, +); break;
+    case OP_ADD: {
+      if (IS_STRING(stack_peek(0)) && IS_STRING(stack_peek(1))) {
+        concatenate();
+      } else if (IS_NUMBER(stack_peek(0)) && IS_NUMBER(stack_peek(1))) {
+        double a = AS_NUMBER(pop_value());
+        double b = AS_NUMBER(pop_value());
+        push_value(NUMBER_VAL(a + b));
+      } else {
+        runtime_error("Operands must be two strings or two numbers");
+        return RUNTIME_ERROR;
+      }
+      break;
+    }
     case OP_SUBTRACT: BINARY_OP(NUMBER_VAL, -); break;
     case OP_MULTIPLY: BINARY_OP(NUMBER_VAL, *); break;
     case OP_DIVIDE: BINARY_OP(NUMBER_VAL, /); break;

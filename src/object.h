@@ -5,7 +5,7 @@
 #include "value.h"
 
 #define OBJ_TYPE(vaue) (AS_OBJECT(value)->type)
-#define IS_STRING(valud) is_obj_type(value, OBJ_STRING)
+#define IS_STRING(value) is_obj_type(value, OBJ_STRING)
 
 #define AS_STRING(value) ((ObjString *)AS_OBJECT(value))
 #define AS_CSTRING(value) (((ObjString *)AS_OBJECT(value))->chars)
@@ -24,6 +24,7 @@ struct ObjString {
   char *chars;
 };
 
+ObjString *take_string(char *chars, int len);
 ObjString *copy_string(const char *chars, int length);
 void object_print(Value value);
 
