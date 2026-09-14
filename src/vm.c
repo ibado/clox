@@ -30,9 +30,14 @@ static inline Value read_constant() {
   return vm.chunk->constants.values[read_byte()];
 }
 
-void vm_init() { reset_stack(); }
+void vm_init() {
+  reset_stack();
+  vm.objects = NULL;
+}
 
-void vm_free() {}
+void vm_free() {
+  free_objects();
+}
 
 static void runtime_error(const char *format, ...) {
   va_list args;
