@@ -1,6 +1,7 @@
 #ifndef clox_vm_h
 #define clox_vm_h
 
+#include "hashtable.h"
 #define STACK_MAX 256
 #include "chunk.h"
 #include "common.h"
@@ -11,6 +12,7 @@ typedef struct {
   u8 *ip;
   Value stack[STACK_MAX];
   Value *stack_top;
+  Hashtable strings;
   Object *objects;
 } VM;
 

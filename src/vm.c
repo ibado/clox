@@ -2,6 +2,7 @@
 #include "chunk.h"
 #include "compiler.h"
 #include "debug.h"
+#include "hashtable.h"
 #include "memory.h"
 #include "object.h"
 #include "value.h"
@@ -33,9 +34,11 @@ static inline Value read_constant() {
 void vm_init() {
   reset_stack();
   vm.objects = NULL;
+  hashtable_init(&vm.strings);
 }
 
 void vm_free() {
+  hashtable_free(&vm.strings);
   free_objects();
 }
 
